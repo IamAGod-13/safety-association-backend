@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String   @id @default(uuid())
+
+  // 🔐 Auth
+  email                 String   @unique
+  password              String
+  name                  String?
+  role                  String   @default("MEMBER")
+  permissions           String[]   @default([])
+
+  // 🔁 Refresh Token (secure storage)
+  refreshTokenHash      String?  @db.Text
+
+  // 🗑 Soft delete
+  isDeleted             Boolean  @default(false)
+  deletedAt             DateTime?
+
+  // 🔐 Reset password
+  resetPasswordToken    String?
+  resetPasswordExpires  DateTime?
+
+  // ✉️ Email verification
+  emailVerified         Boolean  @default(false)
+  emailVerifyToken      String?
+  emailVerifyExpires    DateTime?
+
+  // 🧠 Security tracking (enterprise)
+  lastLoginAt           DateTime?
+  loginAttempts         Int      @default(0)
+  lockedUntil           DateTime?
+
+  // 📊 Relations
+  auditLogs             AuditLog[]
+
+  // 🕒 timestamps
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+
+  // 👤 relation
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // 📌 event info
+  action    String   // LOGIN, LOGOUT, REGISTER, DELETE_USER, etc
+  entity    String?
+  entityId  String?
+
+  // 📦 extra data
+  metadata  Json?
+  ip        String?
+
+  // 🕒 timestamp
+  createdAt DateTime @default(now())
+}
