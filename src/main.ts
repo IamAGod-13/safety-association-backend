@@ -8,7 +8,6 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
   app.use(helmet());
   app.setGlobalPrefix('api');
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -30,13 +29,7 @@ async function bootstrap() {
   });
 
   // 🔐 Global Validation
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
+
 
   // 📚 Swagger Config
   const config = new DocumentBuilder()
@@ -48,7 +41,7 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('api', app, document, {
+  SwaggerModule.setup('docs', app, document, {
     swaggerOptions: {
       persistAuthorization: true,
     },
