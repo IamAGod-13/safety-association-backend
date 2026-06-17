@@ -8,6 +8,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  await app.listen(3000);
   app.use(helmet());
   app.setGlobalPrefix('api');
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -23,7 +24,7 @@ async function bootstrap() {
   // 🔐 CORS (خیلی مهم برای فرانت)
   app.enableCors({
     origin: ['http://localhost:3000',
-      'https://youur-domain.com',
+      'https://your-domain.com',
     ],
     credentials: true,
   });
